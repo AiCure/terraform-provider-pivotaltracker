@@ -17,11 +17,7 @@ func TestClientIntegrations(t *testing.T) {
 		t.Skip("This test requires PVTL_TRACKER_TOKEN to be set")
 	}
 	t.Run("Client should be able to create/list/update/delete a project", func(t *testing.T) {
-		u, err := uuid.NewV4()
-		if err != nil {
-			t.Fatal(err)
-		}
-
+		u := uuid.NewV4()
 		projectName := "prj-" + u.String()
 		modifiedProjectName := "mod-" + u.String()
 		client := pt.NewClient(token)
