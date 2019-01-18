@@ -11,6 +11,7 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
+      - run: go get -u github.com/maxbrunsfeld/counterfeiter
       - run: dep ensure
       - run: make test
       - run: make build
