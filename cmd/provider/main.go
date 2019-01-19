@@ -7,6 +7,12 @@ import (
 	"github.com/xchapter7x/terraform-provider-pivotaltracker/pkg/trackerprovider"
 )
 
+var (
+	Version   string
+	Platform  string
+	Buildtime string
+)
+
 func main() {
 	plugin.Serve(&plugin.ServeOpts{
 		ProviderFunc: func() terraform.ResourceProvider {
