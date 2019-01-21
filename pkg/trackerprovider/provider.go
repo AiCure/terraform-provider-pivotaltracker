@@ -20,7 +20,7 @@ func Create(providerClient ProviderClient) *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"pivotaltracker_project": projects.ProjectResource(),
+			"pivotaltracker_project": projects.NewProjectResource(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{},
 		ConfigureFunc: func(d *schema.ResourceData) (interface{}, error) {
