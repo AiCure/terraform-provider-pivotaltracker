@@ -24,8 +24,28 @@ func NewProjectResource() *schema.Resource {
 
 func createProject(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(pt.ClientCaller)
-	fmt.Println(client)
-	return nil
+	projectRequest := pt.ProjectsRequest{}
+	projectRequest.Name = d.Get("name").(string)
+	projectRequest.Status = d.Get("status").(string)
+	projectRequest.IterationLength = d.Get("iteration_length").(int)
+	projectRequest.PointScale = d.Get("point_scale").(string)
+	projectRequest.BugsAndChoresAreEstimatable = d.Get("bugs_and_chores_are_estimatable").(bool)
+	projectRequest.AutomaticPlanning = d.Get("automatic_planning").(bool)
+	projectRequest.EnableTasks = d.Get("enable_tasks").(bool)
+	projectRequest.VelocityAveragedOver = d.Get("velocity_averaged_over").(int)
+	projectRequest.NumberOfDoneIterationsToShow = d.Get("number_of_done_iterations_to_show").(int)
+	projectRequest.Description = d.Get("description").(string)
+	projectRequest.ProfileContent = d.Get("profile_content").(string)
+	projectRequest.EnableIncomingEmails = d.Get("enable_incoming_emails").(bool)
+	projectRequest.InitialVelocity = d.Get("initial_velocity").(int)
+	projectRequest.ProjectType = d.Get("project_type").(string)
+	projectRequest.Public = d.Get("public").(bool)
+	projectRequest.AtomEnabled = d.Get("atom_enabled").(bool)
+	projectRequest.AccountID = d.Get("account_id").(int)
+	projectRequest.JoinAs = d.Get("join_as").(string)
+	projectResponse, _, err := client.NewProject(projectRequest)
+	d.SetId(string(projectResponse.ID))
+	return err
 }
 
 func readProject(d *schema.ResourceData, meta interface{}) error {
