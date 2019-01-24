@@ -53,7 +53,8 @@ $ terraform apply
 
 
 ### Available Resources
-
+- Members (COMING SOON)
+- Project Membership (COMING SOON)
 - Project Resource [Tracker API Docs](https://www.pivotaltracker.com/help/api/rest/v5#Project)
   - fields:
     - no_owner
