@@ -49,7 +49,7 @@ func createProject(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("creating new project failed: %v", err)
 	}
 
-	d.SetId(string(projectResponse.ID))
+	d.SetId(strconv.Itoa(projectResponse.ID))
 	return nil
 }
 
@@ -81,7 +81,7 @@ func readProject(d *schema.ResourceData, meta interface{}) error {
 	d.Set("project_type", projectResponse.ProjectType)
 	d.Set("public", projectResponse.Public)
 	d.Set("velocity_averaged_over", projectResponse.VelocityAveragedOver)
-	d.SetId(string(projectResponse.ID))
+	d.SetId(strconv.Itoa(projectResponse.ID))
 	return nil
 }
 
@@ -131,7 +131,7 @@ func updateProject(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("update project failed: %v", err)
 	}
 
-	d.SetId(string(projectResponse.ID))
+	d.SetId(strconv.Itoa(projectResponse.ID))
 	return nil
 }
 

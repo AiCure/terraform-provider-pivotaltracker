@@ -2,6 +2,7 @@ package projects_test
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -51,7 +52,7 @@ func TestProject(t *testing.T) {
 				"it should not error",
 			)
 
-			Expect(fakeData.Id()).To(Equal(string(controlResourceID)),
+			Expect(fakeData.Id()).To(Equal(strconv.Itoa(controlResourceID)),
 				"it should set the id of the newly created resource",
 			)
 
@@ -136,11 +137,15 @@ func TestProject(t *testing.T) {
 
 		t.Run("when it reads an existing project", func(t *testing.T) {
 			fakeClient := &ptfakes.FakeClientCaller{}
-			controlProjectResponse := &pt.Project{AccountID: 12345, AtomEnabled: true, Description: "blah"}
+			controlProjectResponse := &pt.Project{ID: 1234, AccountID: 12345, AtomEnabled: true, Description: "blah"}
 			fakeClient.GetProjectReturns(controlProjectResponse, nil, nil)
 			err := projectResource.Read(fakeData, fakeClient)
 			Expect(err).NotTo(HaveOccurred(), "it should not error")
 			Expect(fakeClient.GetProjectCallCount()).To(Equal(1), "it should call the tracker api")
+			Expect(fakeData.Id()).To(Equal(strconv.Itoa(1234)),
+				"it should set the id of the resource",
+			)
+
 			t.Run("it set the resource data with the values from the tracker API", func(t *testing.T) {
 				Expect(fakeData.Get("account_id")).To(Equal(controlProjectResponse.AccountID), "account_id")
 				Expect(fakeData.Get("atom_enabled")).To(Equal(controlProjectResponse.AtomEnabled), "atom_enabled")
@@ -183,6 +188,9 @@ func TestProject(t *testing.T) {
 			Expect(err).NotTo(HaveOccurred(), "it should not error")
 			Expect(fakeClient.UpdateProjectCallCount()).To(Equal(1), "it should call the tracker api")
 			_, updatedProject := fakeClient.UpdateProjectArgsForCall(0)
+			Expect(fakeData.Id()).To(Equal(strconv.Itoa(1234)),
+				"it should set the id of the resource",
+			)
 			t.Run("it set the resource data with the values from the tracker API", func(t *testing.T) {
 				Expect(fakeData.Get("account_id")).To(Equal(updatedProject.AccountID), "account_id")
 				Expect(fakeData.Get("atom_enabled")).To(Equal(updatedProject.AtomEnabled), "atom_enabled")
