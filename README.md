@@ -51,7 +51,7 @@ $ terraform apply
 
 ### Available Resources
 
-- Project Resource
+- Project Resource [Tracker API Docs](https://www.pivotaltracker.com/help/api/rest/v5#Project)
   - fields:
     - no_owner
     - new_account_name
