@@ -163,11 +163,44 @@ func TestProject(t *testing.T) {
 	})
 
 	t.Run("Update", func(t *testing.T) {
-		_, _, projectResource, _ := createControlDataset()
-		t.Skip("this is not yet implemented")
-		t.Run("when update fails", func(t *testing.T) {
-			err := projectResource.Create(nil, &ptfakes.FakeClientCaller{})
+		_, _, projectResource, fakeData := createControlDataset()
+		fakeData.SetId("1234")
+		t.Run("when read fails", func(t *testing.T) {
+			fakeClient := &ptfakes.FakeClientCaller{}
+			fakeClient.UpdateProjectReturns(&pt.Project{}, nil, fmt.Errorf("some erroor msg"))
+			err := projectResource.Update(fakeData, fakeClient)
 			Expect(err).To(HaveOccurred(), "it should error")
+		})
+
+		t.Run("when it reads an existing project", func(t *testing.T) {
+			fakeClient := &ptfakes.FakeClientCaller{}
+			fakeData.Set("name", "someprojects")
+			fakeData.Set("account_id", 12345)
+			fakeData.Set("atom_enabled", true)
+			fakeData.Set("description", "blah")
+			fakeClient.UpdateProjectReturns(&pt.Project{ID: 1234}, nil, nil)
+			err := projectResource.Update(fakeData, fakeClient)
+			Expect(err).NotTo(HaveOccurred(), "it should not error")
+			Expect(fakeClient.UpdateProjectCallCount()).To(Equal(1), "it should call the tracker api")
+			_, updatedProject := fakeClient.UpdateProjectArgsForCall(0)
+			t.Run("it set the resource data with the values from the tracker API", func(t *testing.T) {
+				Expect(fakeData.Get("account_id")).To(Equal(updatedProject.AccountID), "account_id")
+				Expect(fakeData.Get("atom_enabled")).To(Equal(updatedProject.AtomEnabled), "atom_enabled")
+				Expect(fakeData.Get("automatic_planning")).To(Equal(updatedProject.AutomaticPlanning), "automatic_planning")
+				Expect(fakeData.Get("bugs_and_chores_are_estimatable")).To(Equal(updatedProject.BugsAndChoresAreEstimatable), "bugs_and_chores_are_estimateable")
+				Expect(fakeData.Get("description")).To(Equal(updatedProject.Description), "description")
+				Expect(fakeData.Get("enable_incoming_emails")).To(Equal(updatedProject.EnableIncomingEmails), "enable_incoming_emails")
+				Expect(fakeData.Get("enable_tasks")).To(Equal(updatedProject.EnableTasks), "enable_tasks")
+				Expect(fakeData.Get("initial_velocity")).To(Equal(updatedProject.InitialVelocity), "initial_velocity")
+				Expect(fakeData.Get("iteration_length")).To(Equal(updatedProject.IterationLength), "iteration_length")
+				Expect(fakeData.Get("name")).To(Equal(updatedProject.Name), "name")
+				Expect(fakeData.Get("number_of_done_iterations_to_show")).To(Equal(updatedProject.NumberOfDoneIterationsToShow), "number_of_done_iterations_to_show")
+				Expect(fakeData.Get("point_scale")).To(Equal(updatedProject.PointScale), "point_scale")
+				Expect(fakeData.Get("profile_content")).To(Equal(updatedProject.ProfileContent), "profile_content")
+				Expect(fakeData.Get("project_type")).To(Equal(updatedProject.ProjectType), "project_type")
+				Expect(fakeData.Get("public")).To(Equal(updatedProject.Public), "public")
+				Expect(fakeData.Get("velocity_averaged_over")).To(Equal(updatedProject.VelocityAveragedOver), "velocity_averaged_over")
+			})
 		})
 	})
 }

@@ -101,8 +101,37 @@ func deleteProject(d *schema.ResourceData, meta interface{}) error {
 }
 
 func updateProject(d *schema.ResourceData, meta interface{}) error {
+	projectRequest := pt.ProjectRequest{}
+	projectRequest.AccountID = d.Get("account_id").(int)
+	projectRequest.AtomEnabled = d.Get("atom_enabled").(bool)
+	projectRequest.AutomaticPlanning = d.Get("automatic_planning").(bool)
+	projectRequest.BugsAndChoresAreEstimatable = d.Get("bugs_and_chores_are_estimatable").(bool)
+	projectRequest.Description = d.Get("description").(string)
+	projectRequest.EnableIncomingEmails = d.Get("enable_incoming_emails").(bool)
+	projectRequest.EnableTasks = d.Get("enable_tasks").(bool)
+	projectRequest.InitialVelocity = d.Get("initial_velocity").(int)
+	projectRequest.IterationLength = d.Get("iteration_length").(int)
+	projectRequest.JoinAs = d.Get("join_as").(string)
+	projectRequest.Name = d.Get("name").(string)
+	projectRequest.NumberOfDoneIterationsToShow = d.Get("number_of_done_iterations_to_show").(int)
+	projectRequest.PointScale = d.Get("point_scale").(string)
+	projectRequest.ProfileContent = d.Get("profile_content").(string)
+	projectRequest.ProjectType = d.Get("project_type").(string)
+	projectRequest.Public = d.Get("public").(bool)
+	projectRequest.Status = d.Get("status").(string)
+	projectRequest.VelocityAveragedOver = d.Get("velocity_averaged_over").(int)
 	client := meta.(pt.ClientCaller)
-	fmt.Println(client)
+	id, err := strconv.Atoi(d.Id())
+	if err != nil {
+		return fmt.Errorf("convertion of id failed: %v", err)
+	}
+
+	projectResponse, _, err := client.UpdateProject(id, projectRequest)
+	if err != nil {
+		return fmt.Errorf("update project failed: %v", err)
+	}
+
+	d.SetId(string(projectResponse.ID))
 	return nil
 }
 
