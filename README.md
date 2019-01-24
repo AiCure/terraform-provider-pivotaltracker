@@ -41,6 +41,9 @@ EOF
 # initialize plugins
 $ terraform init
 
+# set your tracker API TOKEN (found at the bottom of your profile page https://www.pivotaltracker.com/profile )
+$ export PVTL_TRACKER_TOKEN=xxxxx....
+
 # check your terraform
 $ terraform plan
 
