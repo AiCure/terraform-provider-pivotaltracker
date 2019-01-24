@@ -21,7 +21,7 @@ $ export PLATFORM=osx
 $ curl -L https://github.com/xchapter7x/terraform-provider-pivotaltracker/releases/download/${VERSION}/pivotal_tracker_provider_${PLATFORM} -o ~/terraform-providers/pivotal_tracker_provider
 
 # make it executable just in case
-$ chmod +x -o ~/terraform-providers/pivotal_tracker_provider
+$ chmod +x ~/terraform-providers/pivotal_tracker_provider
 
 # add the provider to your terraformrc (create one like below if one doesnt exist)
 $ cat << EOF > ~/.terraformrc
