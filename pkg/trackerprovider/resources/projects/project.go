@@ -191,6 +191,7 @@ func createSchema() map[string]*schema.Schema {
 		"iteration_length": &schema.Schema{
 			Type:     schema.TypeInt,
 			Optional: true,
+			Computed: true,
 			Description: `
 				int in the request body.
 				 —  The number of weeks in an iteration.`,
@@ -209,6 +210,7 @@ func createSchema() map[string]*schema.Schema {
 		"point_scale": &schema.Schema{
 			Type:     schema.TypeString,
 			Optional: true,
+			Computed: true,
 			Description: `
 				string[255] in the request body.
 				 —  The specification for the "point scale" available 
@@ -236,6 +238,7 @@ func createSchema() map[string]*schema.Schema {
 		"automatic_planning": &schema.Schema{
 			Type:     schema.TypeBool,
 			Optional: true,
+			Computed: true,
 			Description: `
 				boolean in the request body.
 				 —  When false, Tracker suspends the emergent planning of 
@@ -247,6 +250,7 @@ func createSchema() map[string]*schema.Schema {
 		"enable_tasks": &schema.Schema{
 			Type:     schema.TypeBool,
 			Optional: true,
+			Computed: true,
 			Description: `
 				boolean in the request body.
 				 —  When true, Tracker allows individual tasks to be 
@@ -282,6 +286,7 @@ func createSchema() map[string]*schema.Schema {
 		"velocity_averaged_over": &schema.Schema{
 			Type:     schema.TypeInt,
 			Optional: true,
+			Computed: true,
 			Description: `
 				int in the request body.  —  The number of iterations that should be used when
 				averaging the number of points of Done stories in order to compute the
@@ -291,6 +296,7 @@ func createSchema() map[string]*schema.Schema {
 		"number_of_done_iterations_to_show": &schema.Schema{
 			Type:     schema.TypeInt,
 			Optional: true,
+			Computed: true,
 			Description: `
 				int in the request body.  —  There are areas within the Tracker UI and the API
 				in which sets of stories automatically exclude the Done stories contained in
@@ -322,6 +328,7 @@ func createSchema() map[string]*schema.Schema {
 		"enable_incoming_emails": &schema.Schema{
 			Type:     schema.TypeBool,
 			Optional: true,
+			Computed: true,
 			Description: `
 				boolean in the request body.  —  When true, the project will accept
 				incoming email responses to Tracker notification emails and convert
@@ -331,6 +338,7 @@ func createSchema() map[string]*schema.Schema {
 		"initial_velocity": &schema.Schema{
 			Type:     schema.TypeInt,
 			Optional: true,
+			Computed: true,
 			Description: `
 				int in the request body.  —  The number which should be used as the
 				project's velocity when there are not enough recent iterations with
@@ -340,6 +348,7 @@ func createSchema() map[string]*schema.Schema {
 		"project_type": &schema.Schema{
 			Type:     schema.TypeString,
 			Optional: true,
+			Computed: true,
 			Description: `
 				enumerated string in the request body.  —  The project's type which
 				determines visibility and permissions [demo is deprecated].  Valid
@@ -367,6 +376,7 @@ func createSchema() map[string]*schema.Schema {
 		"account_id": &schema.Schema{
 			Type:     schema.TypeInt,
 			Optional: true,
+			Computed: true,
 			Description: `
 				int in the request body.  —  The ID number for the account which
 				contains the project.`,
