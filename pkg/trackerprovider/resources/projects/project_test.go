@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hashicorp/terraform/helper/schema"
 	. "github.com/onsi/gomega"
 	"github.com/salsita/go-pivotaltracker/v5/pivotal"
 	"github.com/xchapter7x/terraform-provider-pivotaltracker/pkg/pt"
@@ -13,10 +14,9 @@ import (
 
 func TestProject(t *testing.T) {
 	RegisterTestingT(t)
-	projectResource := projects.NewProjectResource()
 	t.Run("Schema", func(t *testing.T) {
 		t.Run("Should provide all fields supported by the API", func(t *testing.T) {
-			schemaMap, _ := createControlDataset()
+			schemaMap, _, projectResource, _ := createControlDataset()
 			fieldset := []string{}
 			for f, _ := range schemaMap {
 				fieldset = append(fieldset, f)
@@ -31,12 +31,7 @@ func TestProject(t *testing.T) {
 	})
 
 	t.Run("Create", func(t *testing.T) {
-		schemaMap, controlProjectRequest := createControlDataset()
-		fakeData := projectResource.TestResourceData()
-		for k, v := range schemaMap {
-			fakeData.Set(k, v)
-		}
-
+		_, controlProjectRequest, projectResource, fakeData := createControlDataset()
 		t.Run("when create fails", func(t *testing.T) {
 			fakeClient := &ptfakes.FakeClientCaller{}
 			fakeClient.NewProjectReturns(&pt.Project{}, nil, fmt.Errorf("some erroor msg"))
@@ -57,7 +52,7 @@ func TestProject(t *testing.T) {
 			)
 
 			Expect(fakeData.Id()).To(Equal(string(controlResourceID)),
-				fmt.Sprint("it should set the id of the newly created resource"),
+				"it should set the id of the newly created resource",
 			)
 
 			t.Run("it should call the client with the same values set in the resource data", func(t *testing.T) {
@@ -83,56 +78,92 @@ func TestProject(t *testing.T) {
 		})
 	})
 
-	t.Run("Read", func(t *testing.T) {
-		t.Skip("this is not yet implemented")
-		t.Run("when read fails", func(t *testing.T) {
-			err := projectResource.Create(nil, &ptfakes.FakeClientCaller{})
-			Expect(err).To(HaveOccurred(), "it should error")
-		})
-
-		t.Run("when it reads an existing project", func(t *testing.T) {
-			err := projectResource.Read(nil, &ptfakes.FakeClientCaller{})
-			Expect(err).NotTo(HaveOccurred(), "it should not error")
-			Expect(nil).NotTo(BeNil(), "it should call the tracker api")
-			Expect(nil).NotTo(BeNil(), "it should set the schema to the value from tracker")
-		})
-	})
-
 	t.Run("Delete", func(t *testing.T) {
-		t.Skip("this is not yet implemented")
+		_, _, projectResource, fakeData := createControlDataset()
 		t.Run("when delete fails", func(t *testing.T) {
-			err := projectResource.Create(nil, &ptfakes.FakeClientCaller{})
+			fakeClient := &ptfakes.FakeClientCaller{}
+			fakeClient.DeleteProjectReturns(nil, fmt.Errorf("some erroor msg"))
+			err := projectResource.Delete(fakeData, fakeClient)
 			Expect(err).To(HaveOccurred(), "it should error")
 		})
 
 		t.Run("when it deletes an existing project", func(t *testing.T) {
-			err := projectResource.Delete(nil, &ptfakes.FakeClientCaller{})
+			fakeClient := &ptfakes.FakeClientCaller{}
+			fakeData.SetId("1234")
+			err := projectResource.Delete(fakeData, fakeClient)
 			Expect(err).NotTo(HaveOccurred(), "it should not error")
-			Expect(nil).NotTo(BeNil(), "it should call delete on the project in the tracker api")
+			Expect(fakeClient.DeleteProjectCallCount()).To(Equal(1), "it should call delete exactly once")
+			Expect(fakeClient.DeleteProjectArgsForCall(0)).To(Equal(1234), "it should call delete on the project ID in the tracker api")
 		})
 	})
 
 	t.Run("Exists", func(t *testing.T) {
-		t.Skip("this is not yet implemented")
-		t.Run("when exists fails", func(t *testing.T) {
-			err := projectResource.Create(nil, &ptfakes.FakeClientCaller{})
+		_, _, projectResource, fakeData := createControlDataset()
+		fakeData.SetId("1234")
+		t.Run("when exists call fails", func(t *testing.T) {
+			fakeClient := &ptfakes.FakeClientCaller{}
+			fakeClient.GetProjectReturns(&pt.Project{}, nil, fmt.Errorf("some erroor msg"))
+			_, err := projectResource.Exists(fakeData, fakeClient)
 			Expect(err).To(HaveOccurred(), "it should error")
 		})
 
 		t.Run("when project doesnt exist", func(t *testing.T) {
-			exists, err := projectResource.Exists(nil, &ptfakes.FakeClientCaller{})
+			fakeCaller := &ptfakes.FakeClientCaller{}
+			fakeCaller.GetProjectReturns(&pt.Project{}, nil, nil)
+			exists, err := projectResource.Exists(fakeData, fakeCaller)
 			Expect(err).NotTo(HaveOccurred(), "it should not error")
 			Expect(exists).To(BeFalse(), "it should return false")
 		})
 
 		t.Run("when project exists", func(t *testing.T) {
-			exists, err := projectResource.Exists(nil, &ptfakes.FakeClientCaller{})
+			fakeCaller := &ptfakes.FakeClientCaller{}
+			fakeCaller.GetProjectReturns(&pt.Project{ID: 1234}, nil, nil)
+			exists, err := projectResource.Exists(fakeData, fakeCaller)
 			Expect(err).NotTo(HaveOccurred(), "it should not error")
 			Expect(exists).To(BeTrue(), "it should return true")
 		})
 	})
 
+	t.Run("Read", func(t *testing.T) {
+		_, _, projectResource, fakeData := createControlDataset()
+		fakeData.SetId("1234")
+		t.Run("when read fails", func(t *testing.T) {
+			fakeClient := &ptfakes.FakeClientCaller{}
+			fakeClient.GetProjectReturns(&pt.Project{}, nil, fmt.Errorf("some erroor msg"))
+			err := projectResource.Read(fakeData, fakeClient)
+			Expect(err).To(HaveOccurred(), "it should error")
+		})
+
+		t.Run("when it reads an existing project", func(t *testing.T) {
+			fakeClient := &ptfakes.FakeClientCaller{}
+			controlProjectResponse := &pt.Project{AccountID: 12345, AtomEnabled: true, Description: "blah"}
+			fakeClient.GetProjectReturns(controlProjectResponse, nil, nil)
+			err := projectResource.Read(fakeData, fakeClient)
+			Expect(err).NotTo(HaveOccurred(), "it should not error")
+			Expect(fakeClient.GetProjectCallCount()).To(Equal(1), "it should call the tracker api")
+			t.Run("it set the resource data with the values from the tracker API", func(t *testing.T) {
+				Expect(fakeData.Get("account_id")).To(Equal(controlProjectResponse.AccountID), "account_id")
+				Expect(fakeData.Get("atom_enabled")).To(Equal(controlProjectResponse.AtomEnabled), "atom_enabled")
+				Expect(fakeData.Get("automatic_planning")).To(Equal(controlProjectResponse.AutomaticPlanning), "automatic_planning")
+				Expect(fakeData.Get("bugs_and_chores_are_estimatable")).To(Equal(controlProjectResponse.BugsAndChoresAreEstimatable), "bugs_and_chores_are_estimateable")
+				Expect(fakeData.Get("description")).To(Equal(controlProjectResponse.Description), "description")
+				Expect(fakeData.Get("enable_incoming_emails")).To(Equal(controlProjectResponse.EnableIncomingEmails), "enable_incoming_emails")
+				Expect(fakeData.Get("enable_tasks")).To(Equal(controlProjectResponse.EnableTasks), "enable_tasks")
+				Expect(fakeData.Get("initial_velocity")).To(Equal(controlProjectResponse.InitialVelocity), "initial_velocity")
+				Expect(fakeData.Get("iteration_length")).To(Equal(controlProjectResponse.IterationLength), "iteration_length")
+				Expect(fakeData.Get("name")).To(Equal(controlProjectResponse.Name), "name")
+				Expect(fakeData.Get("number_of_done_iterations_to_show")).To(Equal(controlProjectResponse.NumberOfDoneIterationsToShow), "number_of_done_iterations_to_show")
+				Expect(fakeData.Get("point_scale")).To(Equal(controlProjectResponse.PointScale), "point_scale")
+				Expect(fakeData.Get("profile_content")).To(Equal(controlProjectResponse.ProfileContent), "profile_content")
+				Expect(fakeData.Get("project_type")).To(Equal(controlProjectResponse.ProjectType), "project_type")
+				Expect(fakeData.Get("public")).To(Equal(controlProjectResponse.Public), "public")
+				Expect(fakeData.Get("velocity_averaged_over")).To(Equal(controlProjectResponse.VelocityAveragedOver), "velocity_averaged_over")
+			})
+		})
+	})
+
 	t.Run("Update", func(t *testing.T) {
+		_, _, projectResource, _ := createControlDataset()
 		t.Skip("this is not yet implemented")
 		t.Run("when update fails", func(t *testing.T) {
 			err := projectResource.Create(nil, &ptfakes.FakeClientCaller{})
@@ -141,8 +172,9 @@ func TestProject(t *testing.T) {
 	})
 }
 
-func createControlDataset() (map[string]interface{}, pt.ProjectsRequest) {
+func createControlDataset() (map[string]interface{}, pt.ProjectsRequest, *schema.Resource, *schema.ResourceData) {
 
+	projectResource := projects.NewProjectResource()
 	controlProjects := pt.ProjectsRequest{
 		NewAccountName: "testing",
 		NoOwner:        false,
@@ -195,5 +227,10 @@ func createControlDataset() (map[string]interface{}, pt.ProjectsRequest) {
 		"velocity_averaged_over":            controlProjects.VelocityAveragedOver,
 		"week_start_day":                    controlProjects.WeekStartDay,
 	}
-	return schemaMap, controlProjects
+
+	fakeData := projectResource.TestResourceData()
+	for k, v := range schemaMap {
+		fakeData.Set(k, v)
+	}
+	return schemaMap, controlProjects, projectResource, fakeData
 }

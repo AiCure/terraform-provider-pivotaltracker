@@ -2,6 +2,7 @@ package projects
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/xchapter7x/terraform-provider-pivotaltracker/pkg/pt"
@@ -44,19 +45,58 @@ func createProject(d *schema.ResourceData, meta interface{}) error {
 	projectsRequest.VelocityAveragedOver = d.Get("velocity_averaged_over").(int)
 	client := meta.(pt.ClientCaller)
 	projectResponse, _, err := client.NewProject(projectsRequest)
+	if err != nil {
+		return fmt.Errorf("creating new project failed: %v", err)
+	}
+
 	d.SetId(string(projectResponse.ID))
-	return err
+	return nil
 }
 
 func readProject(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(pt.ClientCaller)
-	fmt.Println(client)
+	id, err := strconv.Atoi(d.Id())
+	if err != nil {
+		return fmt.Errorf("convertion of id failed: %v", err)
+	}
+
+	projectResponse, _, err := client.GetProject(id)
+	if err != nil {
+		return fmt.Errorf("get project api call failed: %v", err)
+	}
+
+	d.Set("account_id", projectResponse.AccountID)
+	d.Set("atom_enabled", projectResponse.AtomEnabled)
+	d.Set("automatic_planning", projectResponse.AutomaticPlanning)
+	d.Set("bugs_and_chores_are_estimatable", projectResponse.BugsAndChoresAreEstimatable)
+	d.Set("description", projectResponse.Description)
+	d.Set("enable_incoming_emails", projectResponse.EnableIncomingEmails)
+	d.Set("enable_tasks", projectResponse.EnableTasks)
+	d.Set("initial_velocity", projectResponse.InitialVelocity)
+	d.Set("iteration_length", projectResponse.IterationLength)
+	d.Set("name", projectResponse.Name)
+	d.Set("number_of_done_iterations_to_show", projectResponse.NumberOfDoneIterationsToShow)
+	d.Set("point_scale", projectResponse.PointScale)
+	d.Set("profile_content", projectResponse.ProfileContent)
+	d.Set("project_type", projectResponse.ProjectType)
+	d.Set("public", projectResponse.Public)
+	d.Set("velocity_averaged_over", projectResponse.VelocityAveragedOver)
+	d.SetId(string(projectResponse.ID))
 	return nil
 }
 
 func deleteProject(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(pt.ClientCaller)
-	fmt.Println(client)
+	id, err := strconv.Atoi(d.Id())
+	if err != nil {
+		return fmt.Errorf("convertion of id failed: %v", err)
+	}
+
+	_, err = client.DeleteProject(id)
+	if err != nil {
+		return fmt.Errorf("delete project failed: %v", err)
+	}
+
 	return nil
 }
 
@@ -68,7 +108,19 @@ func updateProject(d *schema.ResourceData, meta interface{}) error {
 
 func existsProject(d *schema.ResourceData, meta interface{}) (bool, error) {
 	client := meta.(pt.ClientCaller)
-	fmt.Println(client)
+	id, err := strconv.Atoi(d.Id())
+	if err != nil {
+		return false, fmt.Errorf("convertion of id failed: %v", err)
+	}
+
+	project, _, err := client.GetProject(id)
+	if err != nil {
+		return false, fmt.Errorf("get project api call failed: %v", err)
+	}
+
+	if project.ID > 0 {
+		return true, nil
+	}
 	return false, nil
 }
 
