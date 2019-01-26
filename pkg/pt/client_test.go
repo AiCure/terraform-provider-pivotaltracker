@@ -11,11 +11,64 @@ import (
 
 func TestClient(t *testing.T) {
 	RegisterTestingT(t)
+	t.Run("AccountMemberCaller", func(t *testing.T) {
+		t.Run("API Call Structure", func(t *testing.T) {
+			client := &pt.Client{}
+			controlAccountID := 1234
+			controlPersonID := 5678
+			table := []struct {
+				name          string
+				path          string
+				controlMethod string
+				hasData       bool
+				call          func()
+			}{
+				{"DeleteAccountMembers", fmt.Sprintf("accounts/%v/memberships/%v", controlAccountID, controlPersonID), "DELETE", false, func() {
+					client.DeleteAccountMember(controlAccountID, controlPersonID)
+				}},
+				{"UpdateAccountMember", fmt.Sprintf("accounts/%v/memberships/%v", controlAccountID, controlPersonID), "PUT", true, func() {
+					client.UpdateAccountMember(controlAccountID, controlPersonID, pt.AccountMemberRequest{})
+				}},
+				{"NewAccountMember", fmt.Sprintf("accounts/%v/memberships", controlAccountID), "POST", true, func() {
+					client.NewAccountMember(controlAccountID, pt.AccountMemberRequest{})
+				}},
+				{"ListAccountMembers", fmt.Sprintf("accounts/%v/memberships", controlAccountID), "GET", false, func() {
+					client.ListAccountMembers(controlAccountID)
+				}},
+				{"GetAccountMember", fmt.Sprintf("accounts/%v/memberships/%v", controlAccountID, controlPersonID), "GET", false, func() {
+					client.GetAccountMember(controlAccountID, controlPersonID)
+				}},
+			}
+
+			for _, record := range table {
+				t.Run(record.name, func(t *testing.T) {
+					fakeRequestDoer := &ptfakes.FakeRequestDoer{}
+					client.RequestDoer = fakeRequestDoer
+					record.call()
+					Expect(fakeRequestDoer.NewRequestCallCount()).To(Equal(1),
+						"it should call the tracker API once",
+					)
+					method, path, data := fakeRequestDoer.NewRequestArgsForCall(0)
+					Expect(data == nil).NotTo(Equal(record.hasData),
+						fmt.Sprintf("when true we should have data when false we should not (%v: %v)",
+							record.hasData,
+							data,
+						),
+					)
+					Expect(path).To(Equal(record.path),
+						"path for api call is not correct",
+					)
+					Expect(method).To(Equal(record.controlMethod),
+						"method for api call is not correct",
+					)
+				})
+			}
+		})
+	})
+
 	t.Run("ProjectCaller", func(t *testing.T) {
 		t.Run("API Call Structure", func(t *testing.T) {
-			var client *pt.Client
-			fakeRequestDoer := &ptfakes.FakeRequestDoer{}
-			client = &pt.Client{RequestDoer: fakeRequestDoer}
+			client := &pt.Client{}
 			table := []struct {
 				name          string
 				path          string
@@ -40,10 +93,15 @@ func TestClient(t *testing.T) {
 				}},
 			}
 
-			for i, record := range table {
+			for _, record := range table {
 				t.Run(record.name, func(t *testing.T) {
+					fakeRequestDoer := &ptfakes.FakeRequestDoer{}
+					client.RequestDoer = fakeRequestDoer
 					record.call()
-					method, path, data := fakeRequestDoer.NewRequestArgsForCall(i)
+					method, path, data := fakeRequestDoer.NewRequestArgsForCall(0)
+					Expect(fakeRequestDoer.NewRequestCallCount()).To(Equal(1),
+						"it should call the tracker API once",
+					)
 					Expect(data == nil).NotTo(
 						Equal(record.hasData),
 						fmt.Sprintf("when true we should have data when false we should not (%v: %v)",

@@ -24,9 +24,15 @@ func TestProject(t *testing.T) {
 			}
 
 			for k, v := range projectResource.Schema {
-				Expect(fieldset).To(ContainElement(k), "schema element is not expected")
-				Expect(v).NotTo(BeNil(), "schema value is not valid")
-				Expect(v.Description).NotTo(BeEmpty(), "we shouldnt add elements without having a description")
+				Expect(fieldset).To(ContainElement(k),
+					"schema element is not expected",
+				)
+				Expect(v).NotTo(BeNil(),
+					"schema value is not valid",
+				)
+				Expect(v.Description).NotTo(BeEmpty(),
+					"we shouldnt add elements without having a description",
+				)
 			}
 		})
 	})
@@ -37,7 +43,9 @@ func TestProject(t *testing.T) {
 			fakeClient := &ptfakes.FakeClientCaller{}
 			fakeClient.NewProjectReturns(&pt.Project{}, nil, fmt.Errorf("some erroor msg"))
 			err := projectResource.Create(fakeData, fakeClient)
-			Expect(err).To(HaveOccurred(), "it should error")
+			Expect(err).To(HaveOccurred(),
+				"it should error",
+			)
 		})
 
 		t.Run("when it creates a new project", func(t *testing.T) {
@@ -85,16 +93,24 @@ func TestProject(t *testing.T) {
 			fakeClient := &ptfakes.FakeClientCaller{}
 			fakeClient.DeleteProjectReturns(nil, fmt.Errorf("some erroor msg"))
 			err := projectResource.Delete(fakeData, fakeClient)
-			Expect(err).To(HaveOccurred(), "it should error")
+			Expect(err).To(HaveOccurred(),
+				"it should error",
+			)
 		})
 
 		t.Run("when it deletes an existing project", func(t *testing.T) {
 			fakeClient := &ptfakes.FakeClientCaller{}
 			fakeData.SetId("1234")
 			err := projectResource.Delete(fakeData, fakeClient)
-			Expect(err).NotTo(HaveOccurred(), "it should not error")
-			Expect(fakeClient.DeleteProjectCallCount()).To(Equal(1), "it should call delete exactly once")
-			Expect(fakeClient.DeleteProjectArgsForCall(0)).To(Equal(1234), "it should call delete on the project ID in the tracker api")
+			Expect(err).NotTo(HaveOccurred(),
+				"it should not error",
+			)
+			Expect(fakeClient.DeleteProjectCallCount()).To(Equal(1),
+				"it should call delete exactly once",
+			)
+			Expect(fakeClient.DeleteProjectArgsForCall(0)).To(Equal(1234),
+				"it should call delete on the project ID in the tracker api",
+			)
 		})
 	})
 
@@ -105,23 +121,33 @@ func TestProject(t *testing.T) {
 			fakeClient := &ptfakes.FakeClientCaller{}
 			fakeClient.GetProjectReturns(&pt.Project{}, nil, fmt.Errorf("some erroor msg"))
 			_, err := projectResource.Exists(fakeData, fakeClient)
-			Expect(err).To(HaveOccurred(), "it should error")
+			Expect(err).To(HaveOccurred(),
+				"it should error",
+			)
 		})
 
 		t.Run("when project doesnt exist", func(t *testing.T) {
 			fakeCaller := &ptfakes.FakeClientCaller{}
 			fakeCaller.GetProjectReturns(&pt.Project{}, nil, nil)
 			exists, err := projectResource.Exists(fakeData, fakeCaller)
-			Expect(err).NotTo(HaveOccurred(), "it should not error")
-			Expect(exists).To(BeFalse(), "it should return false")
+			Expect(err).NotTo(HaveOccurred(),
+				"it should not error",
+			)
+			Expect(exists).To(BeFalse(),
+				"it should return false",
+			)
 		})
 
 		t.Run("when project exists", func(t *testing.T) {
 			fakeCaller := &ptfakes.FakeClientCaller{}
 			fakeCaller.GetProjectReturns(&pt.Project{ID: 1234}, nil, nil)
 			exists, err := projectResource.Exists(fakeData, fakeCaller)
-			Expect(err).NotTo(HaveOccurred(), "it should not error")
-			Expect(exists).To(BeTrue(), "it should return true")
+			Expect(err).NotTo(HaveOccurred(),
+				"it should not error",
+			)
+			Expect(exists).To(BeTrue(),
+				"it should return true",
+			)
 		})
 	})
 
@@ -132,7 +158,9 @@ func TestProject(t *testing.T) {
 			fakeClient := &ptfakes.FakeClientCaller{}
 			fakeClient.GetProjectReturns(&pt.Project{}, nil, fmt.Errorf("some erroor msg"))
 			err := projectResource.Read(fakeData, fakeClient)
-			Expect(err).To(HaveOccurred(), "it should error")
+			Expect(err).To(HaveOccurred(),
+				"it should error",
+			)
 		})
 
 		t.Run("when it reads an existing project", func(t *testing.T) {
@@ -140,8 +168,12 @@ func TestProject(t *testing.T) {
 			controlProjectResponse := &pt.Project{ID: 1234, AccountID: 12345, AtomEnabled: true, Description: "blah"}
 			fakeClient.GetProjectReturns(controlProjectResponse, nil, nil)
 			err := projectResource.Read(fakeData, fakeClient)
-			Expect(err).NotTo(HaveOccurred(), "it should not error")
-			Expect(fakeClient.GetProjectCallCount()).To(Equal(1), "it should call the tracker api")
+			Expect(err).NotTo(HaveOccurred(),
+				"it should not error",
+			)
+			Expect(fakeClient.GetProjectCallCount()).To(Equal(1),
+				"it should call the tracker api",
+			)
 			Expect(fakeData.Id()).To(Equal(strconv.Itoa(1234)),
 				"it should set the id of the resource",
 			)
@@ -174,7 +206,9 @@ func TestProject(t *testing.T) {
 			fakeClient := &ptfakes.FakeClientCaller{}
 			fakeClient.UpdateProjectReturns(&pt.Project{}, nil, fmt.Errorf("some erroor msg"))
 			err := projectResource.Update(fakeData, fakeClient)
-			Expect(err).To(HaveOccurred(), "it should error")
+			Expect(err).To(HaveOccurred(),
+				"it should error",
+			)
 		})
 
 		t.Run("when it reads an existing project", func(t *testing.T) {
@@ -185,8 +219,12 @@ func TestProject(t *testing.T) {
 			fakeData.Set("description", "blah")
 			fakeClient.UpdateProjectReturns(&pt.Project{ID: 1234}, nil, nil)
 			err := projectResource.Update(fakeData, fakeClient)
-			Expect(err).NotTo(HaveOccurred(), "it should not error")
-			Expect(fakeClient.UpdateProjectCallCount()).To(Equal(1), "it should call the tracker api")
+			Expect(err).NotTo(HaveOccurred(),
+				"it should not error",
+			)
+			Expect(fakeClient.UpdateProjectCallCount()).To(Equal(1),
+				"it should call the tracker api",
+			)
 			_, updatedProject := fakeClient.UpdateProjectArgsForCall(0)
 			Expect(fakeData.Id()).To(Equal(strconv.Itoa(1234)),
 				"it should set the id of the resource",

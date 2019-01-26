@@ -9,6 +9,20 @@ import (
 )
 
 type FakeClientCaller struct {
+	DeleteAccountMemberStub        func(int, int) (*http.Response, error)
+	deleteAccountMemberMutex       sync.RWMutex
+	deleteAccountMemberArgsForCall []struct {
+		arg1 int
+		arg2 int
+	}
+	deleteAccountMemberReturns struct {
+		result1 *http.Response
+		result2 error
+	}
+	deleteAccountMemberReturnsOnCall map[int]struct {
+		result1 *http.Response
+		result2 error
+	}
 	DeleteProjectStub        func(int) (*http.Response, error)
 	deleteProjectMutex       sync.RWMutex
 	deleteProjectArgsForCall []struct {
@@ -22,6 +36,22 @@ type FakeClientCaller struct {
 		result1 *http.Response
 		result2 error
 	}
+	GetAccountMemberStub        func(int, int) (*pt.AccountMember, *http.Response, error)
+	getAccountMemberMutex       sync.RWMutex
+	getAccountMemberArgsForCall []struct {
+		arg1 int
+		arg2 int
+	}
+	getAccountMemberReturns struct {
+		result1 *pt.AccountMember
+		result2 *http.Response
+		result3 error
+	}
+	getAccountMemberReturnsOnCall map[int]struct {
+		result1 *pt.AccountMember
+		result2 *http.Response
+		result3 error
+	}
 	GetProjectStub        func(int) (*pt.Project, *http.Response, error)
 	getProjectMutex       sync.RWMutex
 	getProjectArgsForCall []struct {
@@ -34,6 +64,21 @@ type FakeClientCaller struct {
 	}
 	getProjectReturnsOnCall map[int]struct {
 		result1 *pt.Project
+		result2 *http.Response
+		result3 error
+	}
+	ListAccountMembersStub        func(int) ([]pt.AccountMember, *http.Response, error)
+	listAccountMembersMutex       sync.RWMutex
+	listAccountMembersArgsForCall []struct {
+		arg1 int
+	}
+	listAccountMembersReturns struct {
+		result1 []pt.AccountMember
+		result2 *http.Response
+		result3 error
+	}
+	listAccountMembersReturnsOnCall map[int]struct {
+		result1 []pt.AccountMember
 		result2 *http.Response
 		result3 error
 	}
@@ -51,6 +96,22 @@ type FakeClientCaller struct {
 		result2 *http.Response
 		result3 error
 	}
+	NewAccountMemberStub        func(int, pt.AccountMemberRequest) (*pt.AccountMember, *http.Response, error)
+	newAccountMemberMutex       sync.RWMutex
+	newAccountMemberArgsForCall []struct {
+		arg1 int
+		arg2 pt.AccountMemberRequest
+	}
+	newAccountMemberReturns struct {
+		result1 *pt.AccountMember
+		result2 *http.Response
+		result3 error
+	}
+	newAccountMemberReturnsOnCall map[int]struct {
+		result1 *pt.AccountMember
+		result2 *http.Response
+		result3 error
+	}
 	NewProjectStub        func(pt.ProjectsRequest) (*pt.Project, *http.Response, error)
 	newProjectMutex       sync.RWMutex
 	newProjectArgsForCall []struct {
@@ -63,6 +124,23 @@ type FakeClientCaller struct {
 	}
 	newProjectReturnsOnCall map[int]struct {
 		result1 *pt.Project
+		result2 *http.Response
+		result3 error
+	}
+	UpdateAccountMemberStub        func(int, int, pt.AccountMemberRequest) (*pt.AccountMember, *http.Response, error)
+	updateAccountMemberMutex       sync.RWMutex
+	updateAccountMemberArgsForCall []struct {
+		arg1 int
+		arg2 int
+		arg3 pt.AccountMemberRequest
+	}
+	updateAccountMemberReturns struct {
+		result1 *pt.AccountMember
+		result2 *http.Response
+		result3 error
+	}
+	updateAccountMemberReturnsOnCall map[int]struct {
+		result1 *pt.AccountMember
 		result2 *http.Response
 		result3 error
 	}
@@ -84,6 +162,70 @@ type FakeClientCaller struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeClientCaller) DeleteAccountMember(arg1 int, arg2 int) (*http.Response, error) {
+	fake.deleteAccountMemberMutex.Lock()
+	ret, specificReturn := fake.deleteAccountMemberReturnsOnCall[len(fake.deleteAccountMemberArgsForCall)]
+	fake.deleteAccountMemberArgsForCall = append(fake.deleteAccountMemberArgsForCall, struct {
+		arg1 int
+		arg2 int
+	}{arg1, arg2})
+	fake.recordInvocation("DeleteAccountMember", []interface{}{arg1, arg2})
+	fake.deleteAccountMemberMutex.Unlock()
+	if fake.DeleteAccountMemberStub != nil {
+		return fake.DeleteAccountMemberStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.deleteAccountMemberReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeClientCaller) DeleteAccountMemberCallCount() int {
+	fake.deleteAccountMemberMutex.RLock()
+	defer fake.deleteAccountMemberMutex.RUnlock()
+	return len(fake.deleteAccountMemberArgsForCall)
+}
+
+func (fake *FakeClientCaller) DeleteAccountMemberCalls(stub func(int, int) (*http.Response, error)) {
+	fake.deleteAccountMemberMutex.Lock()
+	defer fake.deleteAccountMemberMutex.Unlock()
+	fake.DeleteAccountMemberStub = stub
+}
+
+func (fake *FakeClientCaller) DeleteAccountMemberArgsForCall(i int) (int, int) {
+	fake.deleteAccountMemberMutex.RLock()
+	defer fake.deleteAccountMemberMutex.RUnlock()
+	argsForCall := fake.deleteAccountMemberArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeClientCaller) DeleteAccountMemberReturns(result1 *http.Response, result2 error) {
+	fake.deleteAccountMemberMutex.Lock()
+	defer fake.deleteAccountMemberMutex.Unlock()
+	fake.DeleteAccountMemberStub = nil
+	fake.deleteAccountMemberReturns = struct {
+		result1 *http.Response
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeClientCaller) DeleteAccountMemberReturnsOnCall(i int, result1 *http.Response, result2 error) {
+	fake.deleteAccountMemberMutex.Lock()
+	defer fake.deleteAccountMemberMutex.Unlock()
+	fake.DeleteAccountMemberStub = nil
+	if fake.deleteAccountMemberReturnsOnCall == nil {
+		fake.deleteAccountMemberReturnsOnCall = make(map[int]struct {
+			result1 *http.Response
+			result2 error
+		})
+	}
+	fake.deleteAccountMemberReturnsOnCall[i] = struct {
+		result1 *http.Response
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeClientCaller) DeleteProject(arg1 int) (*http.Response, error) {
@@ -147,6 +289,73 @@ func (fake *FakeClientCaller) DeleteProjectReturnsOnCall(i int, result1 *http.Re
 		result1 *http.Response
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeClientCaller) GetAccountMember(arg1 int, arg2 int) (*pt.AccountMember, *http.Response, error) {
+	fake.getAccountMemberMutex.Lock()
+	ret, specificReturn := fake.getAccountMemberReturnsOnCall[len(fake.getAccountMemberArgsForCall)]
+	fake.getAccountMemberArgsForCall = append(fake.getAccountMemberArgsForCall, struct {
+		arg1 int
+		arg2 int
+	}{arg1, arg2})
+	fake.recordInvocation("GetAccountMember", []interface{}{arg1, arg2})
+	fake.getAccountMemberMutex.Unlock()
+	if fake.GetAccountMemberStub != nil {
+		return fake.GetAccountMemberStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getAccountMemberReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeClientCaller) GetAccountMemberCallCount() int {
+	fake.getAccountMemberMutex.RLock()
+	defer fake.getAccountMemberMutex.RUnlock()
+	return len(fake.getAccountMemberArgsForCall)
+}
+
+func (fake *FakeClientCaller) GetAccountMemberCalls(stub func(int, int) (*pt.AccountMember, *http.Response, error)) {
+	fake.getAccountMemberMutex.Lock()
+	defer fake.getAccountMemberMutex.Unlock()
+	fake.GetAccountMemberStub = stub
+}
+
+func (fake *FakeClientCaller) GetAccountMemberArgsForCall(i int) (int, int) {
+	fake.getAccountMemberMutex.RLock()
+	defer fake.getAccountMemberMutex.RUnlock()
+	argsForCall := fake.getAccountMemberArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeClientCaller) GetAccountMemberReturns(result1 *pt.AccountMember, result2 *http.Response, result3 error) {
+	fake.getAccountMemberMutex.Lock()
+	defer fake.getAccountMemberMutex.Unlock()
+	fake.GetAccountMemberStub = nil
+	fake.getAccountMemberReturns = struct {
+		result1 *pt.AccountMember
+		result2 *http.Response
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeClientCaller) GetAccountMemberReturnsOnCall(i int, result1 *pt.AccountMember, result2 *http.Response, result3 error) {
+	fake.getAccountMemberMutex.Lock()
+	defer fake.getAccountMemberMutex.Unlock()
+	fake.GetAccountMemberStub = nil
+	if fake.getAccountMemberReturnsOnCall == nil {
+		fake.getAccountMemberReturnsOnCall = make(map[int]struct {
+			result1 *pt.AccountMember
+			result2 *http.Response
+			result3 error
+		})
+	}
+	fake.getAccountMemberReturnsOnCall[i] = struct {
+		result1 *pt.AccountMember
+		result2 *http.Response
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeClientCaller) GetProject(arg1 int) (*pt.Project, *http.Response, error) {
@@ -215,6 +424,72 @@ func (fake *FakeClientCaller) GetProjectReturnsOnCall(i int, result1 *pt.Project
 	}{result1, result2, result3}
 }
 
+func (fake *FakeClientCaller) ListAccountMembers(arg1 int) ([]pt.AccountMember, *http.Response, error) {
+	fake.listAccountMembersMutex.Lock()
+	ret, specificReturn := fake.listAccountMembersReturnsOnCall[len(fake.listAccountMembersArgsForCall)]
+	fake.listAccountMembersArgsForCall = append(fake.listAccountMembersArgsForCall, struct {
+		arg1 int
+	}{arg1})
+	fake.recordInvocation("ListAccountMembers", []interface{}{arg1})
+	fake.listAccountMembersMutex.Unlock()
+	if fake.ListAccountMembersStub != nil {
+		return fake.ListAccountMembersStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.listAccountMembersReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeClientCaller) ListAccountMembersCallCount() int {
+	fake.listAccountMembersMutex.RLock()
+	defer fake.listAccountMembersMutex.RUnlock()
+	return len(fake.listAccountMembersArgsForCall)
+}
+
+func (fake *FakeClientCaller) ListAccountMembersCalls(stub func(int) ([]pt.AccountMember, *http.Response, error)) {
+	fake.listAccountMembersMutex.Lock()
+	defer fake.listAccountMembersMutex.Unlock()
+	fake.ListAccountMembersStub = stub
+}
+
+func (fake *FakeClientCaller) ListAccountMembersArgsForCall(i int) int {
+	fake.listAccountMembersMutex.RLock()
+	defer fake.listAccountMembersMutex.RUnlock()
+	argsForCall := fake.listAccountMembersArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeClientCaller) ListAccountMembersReturns(result1 []pt.AccountMember, result2 *http.Response, result3 error) {
+	fake.listAccountMembersMutex.Lock()
+	defer fake.listAccountMembersMutex.Unlock()
+	fake.ListAccountMembersStub = nil
+	fake.listAccountMembersReturns = struct {
+		result1 []pt.AccountMember
+		result2 *http.Response
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeClientCaller) ListAccountMembersReturnsOnCall(i int, result1 []pt.AccountMember, result2 *http.Response, result3 error) {
+	fake.listAccountMembersMutex.Lock()
+	defer fake.listAccountMembersMutex.Unlock()
+	fake.ListAccountMembersStub = nil
+	if fake.listAccountMembersReturnsOnCall == nil {
+		fake.listAccountMembersReturnsOnCall = make(map[int]struct {
+			result1 []pt.AccountMember
+			result2 *http.Response
+			result3 error
+		})
+	}
+	fake.listAccountMembersReturnsOnCall[i] = struct {
+		result1 []pt.AccountMember
+		result2 *http.Response
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeClientCaller) ListProjects() ([]*pt.Project, *http.Response, error) {
 	fake.listProjectsMutex.Lock()
 	ret, specificReturn := fake.listProjectsReturnsOnCall[len(fake.listProjectsArgsForCall)]
@@ -268,6 +543,73 @@ func (fake *FakeClientCaller) ListProjectsReturnsOnCall(i int, result1 []*pt.Pro
 	}
 	fake.listProjectsReturnsOnCall[i] = struct {
 		result1 []*pt.Project
+		result2 *http.Response
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeClientCaller) NewAccountMember(arg1 int, arg2 pt.AccountMemberRequest) (*pt.AccountMember, *http.Response, error) {
+	fake.newAccountMemberMutex.Lock()
+	ret, specificReturn := fake.newAccountMemberReturnsOnCall[len(fake.newAccountMemberArgsForCall)]
+	fake.newAccountMemberArgsForCall = append(fake.newAccountMemberArgsForCall, struct {
+		arg1 int
+		arg2 pt.AccountMemberRequest
+	}{arg1, arg2})
+	fake.recordInvocation("NewAccountMember", []interface{}{arg1, arg2})
+	fake.newAccountMemberMutex.Unlock()
+	if fake.NewAccountMemberStub != nil {
+		return fake.NewAccountMemberStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.newAccountMemberReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeClientCaller) NewAccountMemberCallCount() int {
+	fake.newAccountMemberMutex.RLock()
+	defer fake.newAccountMemberMutex.RUnlock()
+	return len(fake.newAccountMemberArgsForCall)
+}
+
+func (fake *FakeClientCaller) NewAccountMemberCalls(stub func(int, pt.AccountMemberRequest) (*pt.AccountMember, *http.Response, error)) {
+	fake.newAccountMemberMutex.Lock()
+	defer fake.newAccountMemberMutex.Unlock()
+	fake.NewAccountMemberStub = stub
+}
+
+func (fake *FakeClientCaller) NewAccountMemberArgsForCall(i int) (int, pt.AccountMemberRequest) {
+	fake.newAccountMemberMutex.RLock()
+	defer fake.newAccountMemberMutex.RUnlock()
+	argsForCall := fake.newAccountMemberArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeClientCaller) NewAccountMemberReturns(result1 *pt.AccountMember, result2 *http.Response, result3 error) {
+	fake.newAccountMemberMutex.Lock()
+	defer fake.newAccountMemberMutex.Unlock()
+	fake.NewAccountMemberStub = nil
+	fake.newAccountMemberReturns = struct {
+		result1 *pt.AccountMember
+		result2 *http.Response
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeClientCaller) NewAccountMemberReturnsOnCall(i int, result1 *pt.AccountMember, result2 *http.Response, result3 error) {
+	fake.newAccountMemberMutex.Lock()
+	defer fake.newAccountMemberMutex.Unlock()
+	fake.NewAccountMemberStub = nil
+	if fake.newAccountMemberReturnsOnCall == nil {
+		fake.newAccountMemberReturnsOnCall = make(map[int]struct {
+			result1 *pt.AccountMember
+			result2 *http.Response
+			result3 error
+		})
+	}
+	fake.newAccountMemberReturnsOnCall[i] = struct {
+		result1 *pt.AccountMember
 		result2 *http.Response
 		result3 error
 	}{result1, result2, result3}
@@ -334,6 +676,74 @@ func (fake *FakeClientCaller) NewProjectReturnsOnCall(i int, result1 *pt.Project
 	}
 	fake.newProjectReturnsOnCall[i] = struct {
 		result1 *pt.Project
+		result2 *http.Response
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeClientCaller) UpdateAccountMember(arg1 int, arg2 int, arg3 pt.AccountMemberRequest) (*pt.AccountMember, *http.Response, error) {
+	fake.updateAccountMemberMutex.Lock()
+	ret, specificReturn := fake.updateAccountMemberReturnsOnCall[len(fake.updateAccountMemberArgsForCall)]
+	fake.updateAccountMemberArgsForCall = append(fake.updateAccountMemberArgsForCall, struct {
+		arg1 int
+		arg2 int
+		arg3 pt.AccountMemberRequest
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("UpdateAccountMember", []interface{}{arg1, arg2, arg3})
+	fake.updateAccountMemberMutex.Unlock()
+	if fake.UpdateAccountMemberStub != nil {
+		return fake.UpdateAccountMemberStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.updateAccountMemberReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeClientCaller) UpdateAccountMemberCallCount() int {
+	fake.updateAccountMemberMutex.RLock()
+	defer fake.updateAccountMemberMutex.RUnlock()
+	return len(fake.updateAccountMemberArgsForCall)
+}
+
+func (fake *FakeClientCaller) UpdateAccountMemberCalls(stub func(int, int, pt.AccountMemberRequest) (*pt.AccountMember, *http.Response, error)) {
+	fake.updateAccountMemberMutex.Lock()
+	defer fake.updateAccountMemberMutex.Unlock()
+	fake.UpdateAccountMemberStub = stub
+}
+
+func (fake *FakeClientCaller) UpdateAccountMemberArgsForCall(i int) (int, int, pt.AccountMemberRequest) {
+	fake.updateAccountMemberMutex.RLock()
+	defer fake.updateAccountMemberMutex.RUnlock()
+	argsForCall := fake.updateAccountMemberArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeClientCaller) UpdateAccountMemberReturns(result1 *pt.AccountMember, result2 *http.Response, result3 error) {
+	fake.updateAccountMemberMutex.Lock()
+	defer fake.updateAccountMemberMutex.Unlock()
+	fake.UpdateAccountMemberStub = nil
+	fake.updateAccountMemberReturns = struct {
+		result1 *pt.AccountMember
+		result2 *http.Response
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeClientCaller) UpdateAccountMemberReturnsOnCall(i int, result1 *pt.AccountMember, result2 *http.Response, result3 error) {
+	fake.updateAccountMemberMutex.Lock()
+	defer fake.updateAccountMemberMutex.Unlock()
+	fake.UpdateAccountMemberStub = nil
+	if fake.updateAccountMemberReturnsOnCall == nil {
+		fake.updateAccountMemberReturnsOnCall = make(map[int]struct {
+			result1 *pt.AccountMember
+			result2 *http.Response
+			result3 error
+		})
+	}
+	fake.updateAccountMemberReturnsOnCall[i] = struct {
+		result1 *pt.AccountMember
 		result2 *http.Response
 		result3 error
 	}{result1, result2, result3}
@@ -409,14 +819,24 @@ func (fake *FakeClientCaller) UpdateProjectReturnsOnCall(i int, result1 *pt.Proj
 func (fake *FakeClientCaller) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.deleteAccountMemberMutex.RLock()
+	defer fake.deleteAccountMemberMutex.RUnlock()
 	fake.deleteProjectMutex.RLock()
 	defer fake.deleteProjectMutex.RUnlock()
+	fake.getAccountMemberMutex.RLock()
+	defer fake.getAccountMemberMutex.RUnlock()
 	fake.getProjectMutex.RLock()
 	defer fake.getProjectMutex.RUnlock()
+	fake.listAccountMembersMutex.RLock()
+	defer fake.listAccountMembersMutex.RUnlock()
 	fake.listProjectsMutex.RLock()
 	defer fake.listProjectsMutex.RUnlock()
+	fake.newAccountMemberMutex.RLock()
+	defer fake.newAccountMemberMutex.RUnlock()
 	fake.newProjectMutex.RLock()
 	defer fake.newProjectMutex.RUnlock()
+	fake.updateAccountMemberMutex.RLock()
+	defer fake.updateAccountMemberMutex.RUnlock()
 	fake.updateProjectMutex.RLock()
 	defer fake.updateProjectMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

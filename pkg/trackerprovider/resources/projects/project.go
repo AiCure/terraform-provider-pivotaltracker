@@ -57,7 +57,7 @@ func readProject(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(pt.ClientCaller)
 	id, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return fmt.Errorf("convertion of id failed: %v", err)
+		return fmt.Errorf("conversion of id failed: %v", err)
 	}
 
 	projectResponse, _, err := client.GetProject(id)
@@ -89,7 +89,7 @@ func deleteProject(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(pt.ClientCaller)
 	id, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return fmt.Errorf("convertion of id failed: %v", err)
+		return fmt.Errorf("conversion of id failed: %v", err)
 	}
 
 	_, err = client.DeleteProject(id)
@@ -123,7 +123,7 @@ func updateProject(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(pt.ClientCaller)
 	id, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return fmt.Errorf("convertion of id failed: %v", err)
+		return fmt.Errorf("conversion of id failed: %v", err)
 	}
 
 	projectResponse, _, err := client.UpdateProject(id, projectRequest)
@@ -139,7 +139,7 @@ func existsProject(d *schema.ResourceData, meta interface{}) (bool, error) {
 	client := meta.(pt.ClientCaller)
 	id, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return false, fmt.Errorf("convertion of id failed: %v", err)
+		return false, fmt.Errorf("conversion of id failed: %v", err)
 	}
 
 	project, _, err := client.GetProject(id)

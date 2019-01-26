@@ -19,7 +19,6 @@ const (
 )
 
 type ProjectMembership pivotal.ProjectMembership
-type Person pivotal.Person
 type Project pivotal.Project
 type ProjectRequest struct {
 	Name                         string            `json:"name,omitempty"`
@@ -45,6 +44,30 @@ type ProjectRequest struct {
 	JoinAs                       string            `json:"join_as,omitempty"`
 }
 
+type Person struct {
+	Kind     string `json:"kind,omitempty"`
+	ID       int    `json:"id,omitempty"`
+	Name     string `json:"name,omitempty"`
+	Email    string `json:"email,omitempty"`
+	Initials string `json:"initials,omitempty"`
+	Username string `json:"username,omitempty"`
+}
+
+type AccountMember struct {
+	AccountMemberRequest
+	Person Person `json:"person,omitempty"`
+}
+
+type AccountMemberRequest struct {
+	Name           string `json:"name,omitempty"`
+	AccountID      int    `json:"account_id,omitempty"`
+	PersonID       int    `json:"person_id,omitempty"`
+	Email          string `json:"email,omitempty"`
+	Initials       string `json:"initials,omitempty"`
+	Admin          bool   `json:"admin,omitempty"`
+	ProjectCreator bool   `json:"project_creator,omitempty"`
+}
+
 type ProjectsRequest struct {
 	NoOwner        bool   `json:"no_owner,omitempty"`
 	NewAccountName string `json:"new_account_name,omitempty"`
@@ -60,6 +83,16 @@ type RequestDoer interface {
 //go:generate counterfeiter . ClientCaller
 type ClientCaller interface {
 	ProjectCaller
+	AccountMemberCaller
+}
+
+//go:generate counterfeiter . AccountMemberCaller
+type AccountMemberCaller interface {
+	ListAccountMembers(accountID int) ([]AccountMember, *http.Response, error)
+	GetAccountMember(accountID int, accountMemberID int) (*AccountMember, *http.Response, error)
+	NewAccountMember(accountID int, member AccountMemberRequest) (*AccountMember, *http.Response, error)
+	UpdateAccountMember(accountID int, accountMemberID int, project AccountMemberRequest) (*AccountMember, *http.Response, error)
+	DeleteAccountMember(accountID int, accountMemberID int) (*http.Response, error)
 }
 
 //go:generate counterfeiter . ProjectCaller
@@ -156,4 +189,83 @@ func (service *Client) DeleteProject(projectID int) (*http.Response, error) {
 	}
 
 	return resp, err
+}
+
+// ListAccountMembers - list all account members
+func (service *Client) ListAccountMembers(accountID int) ([]AccountMember, *http.Response, error) {
+	req, err := service.NewRequest("GET", fmt.Sprintf("accounts/%v/memberships", accountID), nil)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed creating request: %v", err)
+	}
+
+	responseMembers := make([]AccountMember, 0)
+	resp, err := service.Do(req, &responseMembers)
+	if err != nil {
+		return nil, resp, fmt.Errorf("failed calling service: %v", err)
+	}
+
+	return responseMembers, resp, nil
+}
+
+// GetAccountMember - retrieve an account member's details from the api
+func (service *Client) GetAccountMember(accountID int, accountMemberID int) (*AccountMember, *http.Response, error) {
+	req, err := service.NewRequest("GET", fmt.Sprintf("accounts/%v/memberships/%v", accountID, accountMemberID), nil)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed creating request: %v", err)
+	}
+
+	responseMember := &AccountMember{}
+	resp, err := service.Do(req, responseMember)
+	if err != nil {
+		return nil, resp, fmt.Errorf("failed calling service: %v", err)
+	}
+
+	return responseMember, resp, nil
+}
+
+// NewAccountMember - creates a new account member record
+func (service *Client) NewAccountMember(accountID int, member AccountMemberRequest) (*AccountMember, *http.Response, error) {
+	req, err := service.NewRequest("POST", fmt.Sprintf("accounts/%v/memberships", accountID), member)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed creating request: %v", err)
+	}
+
+	responseMember := &AccountMember{}
+	resp, err := service.Do(req, responseMember)
+	if err != nil {
+		return nil, resp, fmt.Errorf("failed calling service: %v", err)
+	}
+
+	return responseMember, resp, nil
+}
+
+// UpdateAccountMember - updates a given account member by id.
+func (service *Client) UpdateAccountMember(accountID int, accountMemberID int, member AccountMemberRequest) (*AccountMember, *http.Response, error) {
+	req, err := service.NewRequest("PUT", fmt.Sprintf("accounts/%v/memberships/%v", accountID, accountMemberID), member)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed creating request: %v", err)
+	}
+
+	responseMember := &AccountMember{}
+	resp, err := service.Do(req, responseMember)
+	if err != nil {
+		return nil, resp, fmt.Errorf("failed calling service: %v", err)
+	}
+
+	return responseMember, resp, nil
+}
+
+// DeleteAccountMember deletes a given member by id.
+func (service *Client) DeleteAccountMember(accountID int, accountMemberID int) (*http.Response, error) {
+	req, err := service.NewRequest("DELETE", fmt.Sprintf("accounts/%v/memberships/%v", accountID, accountMemberID), nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed creating request: %v", err)
+	}
+
+	resp, err := service.Do(req, nil)
+	if err != nil {
+		return resp, fmt.Errorf("failed calling service: %v", err)
+	}
+
+	return resp, nil
 }
